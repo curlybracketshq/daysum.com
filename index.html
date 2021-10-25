@@ -1,19 +1,127 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Daysum</title>
-  </head>
-  <body>
-    <h1>Daysum</h1>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Daysum</title>
+  <meta name="description" content="A data visualization tool" />
+</head>
+
+<body>
+  <h1>Daysum</h1>
+  <h2>A data visualization tool</h2>
+  <h2>How does it work</h2>
+  <p>Create a new category and track events when they happen.</p>
+  <p>
+    To track an event click on "Track now" on a specific category or create a
+    new event using the new event form.
+  </p>
+  <h3>Category</h3>
+  <p>
+    A category is a name that can be used to reference a set of events.
+    <br>
+    <em>Examples: read a book, workout, brush your teeth.</em>
+  </p>
+  <p>
+    Categories form a hierarchy.
+    <br>
+    <em>
+      Example: the "workout" category has two subcategories "running" and
+      "push-ups".
+    </em>
+  </p>
+  <h3>Event</h3>
+  <p>An event is a value associated to a point in time and a category.</p>
+  <p>Examples:</p>
+  <ul>
+    <li>
+      On 10/24 I did 20 push-ups (time: 10/24, value: 20, category: push-ups)
+    </li>
+    <li>
+      On 10/25 I read 54 pages of my favorite book (time: 10/25, value: 54,
+      category: read)
+    </li>
+  </ul>
+  <h2>Future development</h2>
+  <h3>Chart</h3>
+  <p>A chart is a visual representation of a set of events.</p>
+  <h3>Workspace</h3>
+  <p>
+    A workspace is a collection of charts and a configuration that includes
+    properties that will control its rendering style.
+  </p>
+  <h3>Theme</h3>
+  <p>
+    A theme defines the look and feel of a workspace. It will be possible to
+    create custom themes. It will also be possible to buy and sell themes in the
+    themes marketplace.
+  </p>
+  <h3>Data sources</h3>
+  <p>
+    It will be possible to load data from external data sources, including CSV,
+    spreadsheets, XML, etc.
+  </p>
+  <h2>Events</h2>
+  <div id="events"></div>
+  <h3>Create a new event</h3>
+  <form id="new_event_form">
     <p>
-        Help me decide what to do with this new domain.
+      <label for="new_event_time">Time</label>
+      <input id="new_event_time" type="text" name="new_event_time" />
     </p>
     <p>
-        Vote your favorite idea here:
-        <a href="https://www.indiehackers.com/post/4630e08055">
-            https://www.indiehackers.com/post/4630e08055
-        </a>
+      <label for="new_event_value">Value</label>
+      <input id="new_event_value" type="text" name="new_event_value" />
     </p>
-  </body>
+    <p>
+      <label for="new_event_category">Category</label>
+      <select id="new_event_category" name="new_event_category">
+      </select>
+    </p>
+    <p>
+      <input type="submit" value="Create" />
+    </p>
+  </form>
+  <h2>Categories</h2>
+  <div id="categories"></div>
+  <h3>Create a new category</h3>
+  <form id="new_category_form">
+    <p>
+      <label for="new_category_name">Name</label>
+      <input id="new_category_name" type="text" name="new_category_name" />
+    </p>
+    <p>
+      <label for="new_category_parent">Parent</label>
+      <select id="new_category_parent" name="new_category_parent">
+      </select>
+    </p>
+    <p>
+      <input type="submit" value="Create" />
+    </p>
+  </form>
+  <h2>About</h2>
+  <p>
+    I bought this domain, then
+    <a href="https://www.indiehackers.com/post/4630e08055">I asked</a> the
+    Indie Hackers community what they thought I should do with it and the
+    majority of people wanted for it to be a data visualization tool.
+  </p>
+  <p>
+    Follow the progress of this project at
+    <a href="https://www.indiehackers.com/product/daysum">
+      https://www.indiehackers.com/product/daysum
+    </a>.
+  </p>
+  <h2>Privacy disclaimer</h2>
+  <p>
+    None of the data you'll input in the app is sent across the network.
+  </p>
+  <p>
+    All of it is kept in your browser's local storage. That means that if you
+    wanted to you could use this app even without being connected to the
+    Internet.
+  </p>
+</body>
+<script type="text/javascript" src="/main.js"></script>
+
 </html>
