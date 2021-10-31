@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "system",
+        "sourceMap": true,
+        "strict": true,
+        "outDir": "./build",
+        "outFile": "./build/main.js",
+    }
+}

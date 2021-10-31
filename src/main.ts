@@ -2,64 +2,51 @@ const storage = window.localStorage
 const schemaVersion = 1
 let isInitialized = false
 
-class DSEvent {
-  /**
-   * @param {number} id
-   * @param {Date} time
-   * @param {number} value
-   * @param {DSCategory} category
-   */
-  constructor(id, time, value, category) {
+interface Serializable {
+  toJSON: () => object
+}
+
+interface DSEventItem {
+  id: number
+  time: Date
+  value: number
+  category_id: number
+}
+
+class DSEvent implements Serializable {
+  id: number
+  time: Date
+  value: number
+  category: DSCategory
+
+  static records: { [x: number]: DSEvent } = {}
+  static recordsByCategory: { [x: number]: DSEvent[] } = {}
+  static currID: number = 0
+
+  constructor(id: number, time: Date, value: number, category: DSCategory) {
     this.id = id
     this.time = time
     this.value = value
     this.category = category
   }
 
-  /**
-   * @type {{ [x: number]: DSEvent; }}
-   */
-  static records = {}
-
-  /**
-   * @type {{ [x: number]: DSEvent[]; }}
-   */
-  static recordsByCategory = {}
-
-  /**
-   * @type {number}
-   */
-  static currID = 0
-
-  /**
-   * @returns {string}
-   */
-  static key() {
+  static key(): string {
     return "events"
   }
 
-  /**
-   * @returns {void}
-   */
-  static load() {
+  static load(): void {
     const dataStr = storage.getItem(this.key())
-    let data = []
+    let data: DSEventItem[] = []
     if (dataStr != null) {
       data = parseJSON(dataStr)
     }
 
-    data.forEach((/** @type {{ id: number; time: Date, value: number, category_id: number; }} */ item) => {
+    data.forEach((item: DSEventItem) => {
       this.set(item.id, item.time, item.value, item.category_id)
     })
   }
 
-  /**
-   * @param {number} id
-   * @param {Date} time
-   * @param {number} value
-   * @param {number} categoryID
-   */
-  static set(id, time, value, categoryID) {
+  static set(id: number, time: Date, value: number, categoryID: number): void {
     const category = DSCategory.fetch(categoryID)
     if (category == null) {
       return
@@ -74,20 +61,11 @@ class DSEvent {
     }
   }
 
-  /**
-   * @returns {number}
-   */
-  static nextID() {
+  static nextID(): number {
     return nextID("events_curr_id")
   }
 
-  /**
-   * @param {Date} time
-   * @param {number} value
-   * @param {number} categoryID
-   * @returns {void}
-   */
-  static create(time, value, categoryID) {
+  static create(time: Date, value: number, categoryID: number): void {
     const category = DSCategory.fetch(categoryID)
     if (category == null) {
       throw "Missing category"
@@ -97,79 +75,56 @@ class DSEvent {
     this.store()
   }
 
-  /**
-   * @returns {void}
-   */
-  static store() {
+  static store(): void {
     storeRecords(this.key(), this.records)
   }
 
-  /**
-   * @returns {string}
-   */
-  key() {
+  key(): string {
     return `event_${this.id}`
   }
 
-  /**
-   * @returns {Object}
-   */
-  toJSON() {
+  toJSON(): object {
     return { id: this.id, time: this.time, value: this.value, category_id: this.category.id }
   }
 }
 
-class DSCategory {
-  /**
-   * @param {number} id
-   * @param {string} name
-   * @param {?DSCategory} parent
-   */
-  constructor(id, name, parent) {
+interface DSCategoryItem {
+  id: number
+  name: string
+  parent_id: number
+}
+
+class DSCategory implements Serializable {
+  id: number
+  name: string
+  parent: DSCategory | null
+
+  static records: { [x: number]: DSCategory } = {}
+  static recordsByParent: { [x: number]: DSCategory[] } = {}
+
+  constructor(id: number, name: string, parent: DSCategory | null) {
     this.id = id
     this.name = name
     this.parent = parent
   }
 
-  /**
-   * @type {{ [x: number]: DSCategory; }}
-   */
-  static records = {}
-
-  /**
-   * @type {{ [x: number]: DSCategory[]; }}
-   */
-  static recordsByParent = {}
-
-  /**
-   * @returns {string}
-   */
-  static key() {
+  static key(): string {
     return "categories"
   }
 
-  /**
-   * @returns {void}
-   */
-  static load() {
+  static load(): void {
     const dataStr = storage.getItem(this.key())
-    let data = []
+    let data: DSCategoryItem[] = []
     if (dataStr != null) {
       data = parseJSON(dataStr)
     }
 
-    data.forEach((/** @type {{ id: number; name: string; parent_id: number; }} */ item) => {
+    data.forEach((item: DSCategoryItem) => {
       this.set(item.id, item.name, item.parent_id)
     })
   }
 
-  /**
-   * @param {number} id
-   * @param {string} name
-   * @param {number} parentID
-   * @returns {void}
-   */
-  static set(id, name, parentID) {
+  static set(id: number, name: string, parentID: number): void {
     const parent = this.records[parentID]
     const category = new this(id, name, parent)
     this.records[id] = category
@@ -181,34 +136,19 @@ class DSCategory {
     }
   }
 
-  /**
-   * @param {number} id
-   * @returns {?DSCategory}
-   */
-  static fetch(id) {
+  static fetch(id: number): DSCategory | null {
     return this.records[id]
   }
 
-  /**
-   * @returns {number}
-   */
-  static nextID() {
+  static nextID(): number {
     return nextID("categories_curr_id")
   }
 
-  /**
-   * @returns {void}
-   */
-  static store() {
+  static store(): void {
     storeRecords(this.key(), this.records)
   }
 
-  /**
-   * @param {string} name
-   * @param {number} parentID
-   * @returns {void}
-   */
-  static create(name, parentID) {
+  static create(name: string, parentID: number): void {
     if (name.length < 1) {
       throw "Invalid name"
     }
@@ -217,26 +157,16 @@ class DSCategory {
     this.store()
   }
 
-  /**
-   * @returns {string}
-   */
-  key() {
+  key(): string {
     return `category_${this.id}`
   }
 
-  /**
-   * @returns {Object}
-   */
-  toJSON() {
+  toJSON(): object {
     return { id: this.id, name: this.name, parent_id: this.parent?.id }
   }
 }
 
-
-/**
- * @returns {void}
- */
-function init() {
+function init(): void {
   if (isInitialized) {
     throw "App already initialized"
   }
@@ -264,10 +194,7 @@ function init() {
   isInitialized = true
 }
 
-/**
- * @returns {void}
- */
-function checkSchemaVersion() {
+function checkSchemaVersion(): void {
   const schemaVersionData = storage.getItem("schemaVersion")
   if (schemaVersionData == null) {
     storage.setItem("schemaVersion", schemaVersion.toString())
@@ -286,10 +213,7 @@ function checkSchemaVersion() {
   }
 }
 
-/**
- * @returns {void}
- */
-function renderCategories() {
+function renderCategories(): void {
   const categoriesElement = document.getElementById("categories")
   if (!(categoriesElement instanceof HTMLElement)) {
     throw "Missing element"
@@ -328,11 +252,7 @@ function renderCategories() {
   }
 }
 
-/**
- * @param {number} level
- * @returns {HTMLElement | string}
- */
-function renderCategoriesHierarchy(level) {
+function renderCategoriesHierarchy(level: number): HTMLElement | string {
   const children = DSCategory.recordsByParent[level] ?? [];
   if (children.length < 1) {
     return "";
@@ -340,7 +260,7 @@ function renderCategoriesHierarchy(level) {
 
   const categoryReferencesElement = document.createElement("ul")
 
-  DSCategory.recordsByParent[level].forEach((/** @type {DSCategory} */ category) => {
+  DSCategory.recordsByParent[level].forEach((/** @type {DSCategory} */ category: DSCategory) => {
     const categoryReferenceItemElement = document.createElement("li")
     categoryReferencesElement.append(categoryReferenceItemElement)
 
@@ -354,12 +274,7 @@ function renderCategoriesHierarchy(level) {
   return categoryReferencesElement;
 }
 
-/**
- * @param {HTMLSelectElement} element
- * @param {string} defaultOption
- * @returns {void}
- */
-function renderCategoriesSelect(element, defaultOption) {
+function renderCategoriesSelect(element: HTMLSelectElement, defaultOption: string): void {
   element.innerHTML = ""
 
   const defaultOptionElement = document.createElement("option")
@@ -378,12 +293,7 @@ function renderCategoriesSelect(element, defaultOption) {
   }
 }
 
-/**
- * @param {HTMLElement} element
- * @param {DSCategory} category
- * @returns {HTMLElement}
- */
-function renderCategory(element, category) {
+function renderCategory(element: HTMLElement, category: DSCategory): HTMLElement {
   let categoryName = document.createElement("h3")
   categoryName.textContent = category.name
   element.append(categoryName)
@@ -418,12 +328,8 @@ function renderCategory(element, category) {
   return element
 }
 
-/**
- * @param {DSCategory} category
- * @returns {(event: { preventDefault: () => void; }) => void}
- */
-function trackNow(category) {
-  return function (/** @type {{ preventDefault: () => void; }} */ event) {
+function trackNow(category: DSCategory): (event: Event) => void {
+  return function (event: Event) {
     event.preventDefault()
 
     DSEvent.create(new Date(), 1, category.id)
@@ -437,10 +343,7 @@ function trackNow(category) {
   }
 }
 
-/**
- * @returns {void}
- */
-function renderEvents() {
+function renderEvents(): void {
   const eventsElement = document.getElementById("events")
   if (!(eventsElement instanceof HTMLElement)) {
     throw "Missing element"
@@ -463,11 +366,7 @@ function renderEvents() {
   }
 }
 
-/**
- * @param {{ preventDefault: () => void; }} event
- * @returns {void}
- */
-function createNewEvent(event) {
+function createNewEvent(event: Event): void {
   event.preventDefault()
 
   if (!isInitialized) {
@@ -515,11 +414,7 @@ function createNewEvent(event) {
   newEventCategoryElement.value = ""
 }
 
-/**
- * @param {{ preventDefault: () => void; }} event
- * @returns {void}
- */
-function createNewCategory(event) {
+function createNewCategory(event: Event): void {
   event.preventDefault()
 
   if (!isInitialized) {
@@ -546,12 +441,7 @@ function createNewCategory(event) {
   newCategoryParentElement.value = ""
 }
 
-
-/**
- * @param {string} key
- * @returns {number}
- */
-function nextID(key) {
+function nextID(key: string): number {
   const currIDData = storage.getItem(key)
   let currID
   if (currIDData == null) {
@@ -565,22 +455,11 @@ function nextID(key) {
   return currID
 }
 
-/**
- * @param {number} count
- * @param {string} singular
- * @param {string} plural
- * @returns {string}
- */
-function pluralize(count, singular, plural) {
+function pluralize(count: number, singular: string, plural: string): string {
   return `${count} ${count == 1 ? singular : plural}`
 }
 
-/**
- * @param {string} key
- * @param {string | number} value
- * @returns {string | number | Date}
- */
-function deserializeDate(key, value) {
+function deserializeDate(key: string, value: string | number): string | number | Date {
   if (key === "time") {
     return new Date(value)
   }
@@ -588,20 +467,11 @@ function deserializeDate(key, value) {
   return value
 }
 
-/**
- * @param {string} data
- * @returns {Object}
- */
-function parseJSON(data) {
+function parseJSON(data: string): any {
   return JSON.parse(data, deserializeDate)
 }
 
-/**
- * @param {string} key
- * @param {{ [x: string]: { toJSON: () => string; }; }} records
- * @returns {void}
- */
-function storeRecords(key, records) {
+function storeRecords(key: string, records: { [x: string]: Serializable }): void {
   let data = []
   for (const key in records) {
     if (Object.hasOwnProperty.call(records, key)) {
