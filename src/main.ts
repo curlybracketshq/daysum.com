@@ -220,16 +220,6 @@ function renderCategories(): void {
   }
   categoriesElement.innerHTML = ""
 
-  if (Object.keys(DSCategory.records).length < 1) {
-    let p = document.createElement("p")
-    p.textContent =
-      "You didn't create any category yet. Create a new category using the form below."
-    categoriesElement.append(p)
-    return
-  }
-
-  categoriesElement.append(renderCategoriesHierarchy(-1));
-
   const newEventCategoryElement = document.getElementById("new_event_category")
   if (!(newEventCategoryElement instanceof HTMLSelectElement)) {
     throw "Missing element"
@@ -241,6 +231,16 @@ function renderCategories(): void {
     throw "Missing element"
   }
   renderCategoriesSelect(newCategoryParentElement, "-- Select a parent category --")
+
+  if (Object.keys(DSCategory.records).length < 1) {
+    let p = document.createElement("p")
+    p.textContent =
+      "You didn't create any category yet. Create a new category using the form below."
+    categoriesElement.append(p)
+    return
+  }
+
+  categoriesElement.append(renderCategoriesHierarchy(-1));
 
   for (const key in DSCategory.records) {
     if (Object.hasOwnProperty.call(DSCategory.records, key)) {
