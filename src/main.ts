@@ -1,6 +1,5 @@
 const storage = window.localStorage
 const schemaVersion = 1
-let isInitialized = false
 
 interface Serializable {
   toJSON: () => object
@@ -91,7 +90,7 @@ class DSEvent implements Serializable {
 interface DSCategoryItem {
   id: number
   name: string
-  parent_id: number
+  parent_id: number | null
 }
 
 class DSCategory implements Serializable {
@@ -124,8 +123,8 @@ class DSCategory implements Serializable {
     })
   }
 
-  static set(id: number, name: string, parentID: number): void {
-    const parent = this.records[parentID]
+  static set(id: number, name: string, parentID: number | null): void {
+    const parent = parentID == null ? null : this.records[parentID]
     const category = new this(id, name, parent)
     this.records[id] = category
     const level = parentID ?? -1
@@ -148,7 +147,7 @@ class DSCategory implements Serializable {
     storeRecords(this.key(), this.records)
   }
 
-  static create(name: string, parentID: number): void {
+  static create(name: string, parentID: number | null): void {
     if (name.length < 1) {
       throw "Invalid name"
     }
@@ -164,34 +163,6 @@ class DSCategory implements Serializable {
   toJSON(): object {
     return { id: this.id, name: this.name, parent_id: this.parent?.id }
   }
-}
-
-function init(): void {
-  if (isInitialized) {
-    throw "App already initialized"
-  }
-
-  checkSchemaVersion()
-
-  DSCategory.load()
-  DSEvent.load()
-
-  const newEventFormElement = document.getElementById("new_event_form")
-  if (!(newEventFormElement instanceof HTMLFormElement)) {
-    throw "Missing form"
-  }
-  newEventFormElement.onsubmit = createNewEvent
-
-  const newCategoryFormElement = document.getElementById("new_category_form")
-  if (!(newCategoryFormElement instanceof HTMLFormElement)) {
-    throw "Missing form"
-  }
-  newCategoryFormElement.onsubmit = createNewCategory
-
-  renderCategories()
-  renderEvents()
-
-  isInitialized = true
 }
 
 function checkSchemaVersion(): void {
@@ -369,10 +340,6 @@ function renderEvents(): void {
 function createNewEvent(event: Event): void {
   event.preventDefault()
 
-  if (!isInitialized) {
-    throw "App not initialized"
-  }
-
   const newEventTimeElement = document.getElementById("new_event_time")
   if (!(newEventTimeElement instanceof HTMLInputElement)) {
     throw "Missing field"
@@ -417,10 +384,6 @@ function createNewEvent(event: Event): void {
 function createNewCategory(event: Event): void {
   event.preventDefault()
 
-  if (!isInitialized) {
-    throw "App not initialized"
-  }
-
   const newCategoryNameElement = document.getElementById("new_category_name")
   if (!(newCategoryNameElement instanceof HTMLInputElement)) {
     throw "Missing field"
@@ -433,7 +396,7 @@ function createNewCategory(event: Event): void {
   }
   const newCategoryParentID = parseInt(newCategoryParentElement.value, 10)
 
-  DSCategory.create(newCategoryName, newCategoryParentID)
+  DSCategory.create(newCategoryName, isNaN(newCategoryParentID) ? null : newCategoryParentID)
   renderCategories()
 
   // clear form
@@ -481,5 +444,3 @@ function storeRecords(key: string, records: { [x: string]: Serializable }): void
   }
   storage.setItem(key, JSON.stringify(data))
 }
-
-window.onload = init
