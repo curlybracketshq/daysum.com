@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Daysum</title>
+  <meta name="description" content="A data visualization tool" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+
+<body>
+  <h1>Daysum</h1>
+  <h2>A data visualization tool</h2>
+  <h3>Pie Chart</h3>
+  <svg id="svg" width="600" height="400" xmlns="http://www.w3.org/2000/svg"></svg>
+  <h3>Data</h3>
+  <ul id="data"></ul>
+  <h3>New Item</h3>
+  <form id="new_data_form">
+    <p>
+      <label for="new_data_name">Name</label>
+      <input id="new_data_name" name="new_data_name" type="text" />
+    </p>
+    <p>
+      <label for="new_data_value">Value</label>
+      <input id="new_data_value" name="new_data_value" type="text" />
+    </p>
+    <p>
+      <input type="submit" value="Add data" />
+    </p>
+  </form>
+  <h3>Configuration</h3>
+  <form id="configuration">
+    <p>
+      <label for="is_sorted">Is data sorted by value?</label>
+      <input id="is_sorted" name="is_sorted" type="checkbox" />
+    </p>
+    <p>
+      <label for="chart_tint">Chart tint</label>
+      <input id="chart_tint" name="chart_tint" type="color" />
+    </p>
+  </form>
+</body>
+<script type="text/javascript" src="/build/experiments/pie-chart/src/index.js"></script>
+
+</html>
