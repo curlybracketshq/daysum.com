@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Daysum</title>
+  <meta name="description" content="A data visualization tool" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+
+<body>
+  <h1>Daysum</h1>
+  <h2>A data visualization tool</h2>
+  <h3>SVG Arc tool</h3>
+  <svg id="svg" width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+    <path id="path" d="M 300 200 L 150 200 A 150 150 0 1 0 300 50 Z" fill="red" stroke="blue" stroke-width="2" />
+    <circle id="start_dot" cx="150" cy="200" r="4" fill="green" />
+    <circle id="end_dot" cx="300" cy="50" r="4" fill="yellow" />
+    <rect x="1" y="1" width="598" height="398" fill="none" stroke="blue" stroke-width="2" />
+  </svg>
+  <form>
+    <p>
+      <label for="start_angle">Start angle: <span id="start_angle_text"></span>&deg;</label>
+      <br />
+      <input id="start_angle" name="start_angle" type="range" max="360" />
+    </p>
+    <p>
+      <label for="sweep">Sweep: <span id="sweep_text"></span>&deg;</label>
+      <br />
+      <input id="sweep" name="sweep" type="range" max="360" />
+    </p>
+  </form>
+</body>
+<script type="text/javascript" src="/build/svg-arc/src/index.js"></script>
+
+</html>
